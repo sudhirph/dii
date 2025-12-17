@@ -6,6 +6,9 @@ dependencies = [
     "fastapi",
     "uvicorn",
     "pydantic",
+    "psycopg2-binary",
+    "PyPDF2",
+    "pandas",
 ]
 
 [tool.setuptools]

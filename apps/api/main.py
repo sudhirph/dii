@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from ingest import router as ingest_router
 
 app = FastAPI(title="DII API")
 
@@ -7,3 +8,4 @@ app = FastAPI(title="DII API")
 def health():
     return {"status": "ok"}
 
+app.include_router(ingest_router)
