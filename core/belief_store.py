@@ -51,6 +51,45 @@ def get_latest_belief(event_id: str, entity_id: str) -> Optional[BeliefSnapshot]
         conn.close()
 
 
+def get_belief_history(event_id: str, entity_id: str, limit: int = 20):
+    """Get belief history for a given event and entity.
+    
+    Args:
+        event_id: The event identifier
+        entity_id: The entity identifier
+        limit: Maximum number of records to return (default: 20)
+        
+    Returns:
+        List of dictionaries with: belief_id, probability, confidence, as_of
+        Ordered by as_of ascending (oldest first)
+    """
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT belief_id, probability, confidence, as_of
+                FROM belief_snapshots
+                WHERE event_id = %s AND entity_id = %s
+                ORDER BY as_of ASC
+                LIMIT %s
+                """,
+                (event_id, entity_id, limit),
+            )
+            rows = cur.fetchall()
+            return [
+                {
+                    "belief_id": row[0],
+                    "probability": row[1],
+                    "confidence": row[2],
+                    "as_of": row[3],
+                }
+                for row in rows
+            ]
+    finally:
+        conn.close()
+
+
 def insert_belief_snapshot(belief: BeliefSnapshot):
     """Insert a new belief snapshot. Beliefs are immutable - this always creates a new record.
     
